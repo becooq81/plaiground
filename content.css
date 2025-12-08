@@ -1,0 +1,34 @@
+/* Content CSS - injected into web pages */
+
+/* Example: Style any custom elements you inject into pages */
+
+.plaiground-highlight {
+  background-color: #fef3c7;
+  border-radius: 3px;
+  padding: 2px 4px;
+}
+
+.plaiground-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+

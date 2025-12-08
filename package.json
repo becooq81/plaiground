@@ -1,0 +1,23 @@
+{
+  "name": "plaiground-extension",
+  "version": "1.0.0",
+  "description": "A modern Chrome extension built with Manifest V3",
+  "scripts": {
+    "generate-icons": "node generate-icons.js",
+    "lint": "echo 'Add linting tools like ESLint here'",
+    "test": "echo 'Add tests here'"
+  },
+  "keywords": [
+    "chrome-extension",
+    "browser-extension",
+    "manifest-v3"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": ""
+  }
+}
+

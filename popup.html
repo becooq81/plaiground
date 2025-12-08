@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plaiground Extension</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Plaiground</h1>
+    </header>
+    <main>
+      <div class="section">
+        <p>Analyze this page and suggest calmer, less clickbait headlines.</p>
+        <button id="analyzeBtn" class="btn-primary">Analyze page</button>
+        <p class="hint">Works best on news sites and articles.</p>
+      </div>
+      <div class="section">
+        <div id="status" class="status">Ready to analyze.</div>
+        <ul id="titlesList" class="title-list"></ul>
+      </div>
+    </main>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
+
