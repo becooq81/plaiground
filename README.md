@@ -1,65 +1,28 @@
-# Plaiground Chrome Extension
+# Extension Icons
 
-A modern Chrome extension built with Manifest V3, featuring a beautiful UI and clean architecture.
+Place your extension icons in this directory:
 
-## Features
+- `icon16.png` - 16x16 pixels (toolbar icon)
+- `icon48.png` - 48x48 pixels (extension management page)
+- `icon128.png` - 128x128 pixels (Chrome Web Store)
 
-- 🎨 Modern, gradient-based UI design
-- ⚡ Manifest V3 (latest Chrome extension standard)
-- 💾 Chrome storage integration
-- 🔄 Background service worker
-- 📝 Content script for page interaction
-- 🎯 Clean, modular code structure
+## Quick Icon Generation
 
-## Quick Start
+You can:
+1. Create icons using design tools (Figma, Sketch, etc.)
+2. Use online generators like [favicon.io](https://favicon.io)
+3. Use the placeholder script below to generate simple colored icons
 
-1. **Add Icons**: Create or add PNG icons to the `icons/` directory (see `icons/README.md`)
-2. **Load Extension**: 
-   - Open Chrome and go to `chrome://extensions/`
-   - Enable "Developer mode"
-   - Click "Load unpacked" and select this directory
-3. **Test**: Click the extension icon in your toolbar
+## Temporary Placeholder
 
-For detailed instructions, see [INSTALLATION.md](INSTALLATION.md)
+For development, you can use any PNG images with the correct dimensions or generate them using tools like ImageMagick:
 
-## Project Structure
-
-```
-├── manifest.json       # Extension configuration
-├── popup.html          # Extension popup interface
-├── popup.css           # Popup styling
-├── popup.js            # Popup functionality
-├── background.js       # Background service worker
-├── content.js          # Content script (runs on web pages)
-├── content.css         # Styles injected into pages
-└── icons/              # Extension icons
+```bash
+# If you have ImageMagick installed:
+convert -size 16x16 xc:#667eea icons/icon16.png
+convert -size 48x48 xc:#667eea icons/icon48.png
+convert -size 128x128 xc:#667eea icons/icon128.png
 ```
 
-## Development
+Or simply create simple colored squares in any image editor.
 
-### Making Changes
-
-After editing any files:
-1. Go to `chrome://extensions/`
-2. Click the reload button on your extension
-
-### Debugging
-
-- **Popup**: Right-click extension icon → "Inspect popup"
-- **Background**: Click "service worker" on extension card
-- **Content Script**: Open DevTools (F12) on any webpage
-
-## Customization
-
-- Edit `manifest.json` to change name, description, and permissions
-- Modify `popup.html` and `popup.css` to customize the UI
-- Update logic in `popup.js`, `background.js`, and `content.js`
-
-## Learn More
-
-- [Chrome Extension Documentation](https://developer.chrome.com/docs/extensions/)
-- [Manifest V3 Migration Guide](https://developer.chrome.com/docs/extensions/mv3/intro/)
-
-## License
-
-See [LICENSE](LICENSE) file for details.
