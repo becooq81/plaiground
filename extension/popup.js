@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
         li.innerHTML = `
           <div class="label">번역된 제목 (원본을 맞춰보세요!)</div>
           <div class="alternative">${alternative}</div>
-          <div class="source">Source: ${source}</div>
+          <div class="source">출처: ${source}</div>
           <div class="game-guess-section">
             <input type="text" 
                    class="game-guess-input" 
@@ -209,10 +209,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
       } else {
         li.innerHTML = `
-          <div class="label">Alternative</div>
+          <div class="label">대안 제목</div>
           <div class="alternative">${alternative}</div>
-          <div class="original">Original: ${original}</div>
-          <div class="source">Source: ${source}</div>
+          <div class="original">원본: ${original}</div>
+          <div class="source">출처: ${source}</div>
         `;
       }
       
@@ -261,7 +261,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   async function analyzeCurrentPage() {
-    setStatus('Analyzing page titles...', '');
+    setStatus('페이지 제목 분석 중...', '');
     titlesList.innerHTML = '';
 
     try {
@@ -291,17 +291,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
       const titles = response?.titles || [];
       if (!titles.length) {
-        setStatus('No news-style titles detected on this page.', 'error');
+        setStatus('이 페이지에서 뉴스 제목을 찾을 수 없습니다.', 'error');
         return;
       }
 
-      setStatus('Rewriting with AI...', '');
+      setStatus('AI로 재작성 중...', '');
       let rewritten = [];
       try {
         rewritten = await rewriteWithBackend(titles);
       } catch (err) {
         console.error('Rewrite error:', err);
-        setStatus('Rewrite failed; showing originals.', 'error');
+        setStatus('재작성 실패; 원본 제목을 표시합니다.', 'error');
         rewritten = titles.map((t) => t.original);
       }
 
@@ -341,11 +341,11 @@ document.addEventListener('DOMContentLoaded', function() {
       if (isGameMode) {
         setStatus(`게임 모드: ${rewrites.length}개 제목이 번역되었습니다. 원본을 맞춰보세요!`, 'success');
       } else {
-        setStatus(`Rewrote ${rewrites.length} headline${rewrites.length === 1 ? '' : 's'}.`, 'success');
+        setStatus(`${rewrites.length}개 제목을 재작성했습니다.`, 'success');
       }
     } catch (error) {
       console.error('Analysis error:', error);
-      setStatus('Unable to analyze this page. Try reloading and ensure content scripts are allowed.', 'error');
+      setStatus('이 페이지를 분석할 수 없습니다. 페이지를 새로고침하고 콘텐츠 스크립트가 허용되어 있는지 확인하세요.', 'error');
     }
   }
 

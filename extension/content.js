@@ -124,7 +124,7 @@ function injectAlternatives(candidates, gameMode = false) {
 
       const label = document.createElement('div');
       label.className = 'newtox-alt-label';
-      label.textContent = 'Alternative';
+      label.textContent = '대안 제목';
 
       const text = document.createElement('div');
       text.className = 'newtox-alt-text';
@@ -186,8 +186,30 @@ function shouldExclude(el, text) {
     '댓글', '좋아요', '구독', '알림', '설정', '더보기',
     '이전', '다음', '이전글', '다음글', '목록', '목차',
     '홈', '홈으로', '맨위로', 'top', 'bottom',
-    'copyright', '저작권', 'all rights reserved'
+    'copyright', '저작권', 'all rights reserved',
+    // 네이버 뉴스 특화 제외 패턴
+    '언론사별', '정치', '경제', '사회', '생활/문화', 'IT/과학', '세계',
+    '랭킹', '신문보기', '오피니언', 'TV', '팩트체크',
+    '전체 언론사', '뉴스스탠드', '라이브러리', '구독설정',
+    '구독', '블로터', '부산일보', '기자협회보', '비즈워치', '매일경제',
+    '한경비즈니스', '한겨레', '시사IN', '매일신문',  // 언론사 이름 제외
+    // 뉴스가 아닌 단어들
+    '방송뉴스', '언론사편집', '이슈NOW', '이슈 now', '이슈 Now',
+    '콘텐츠', '엔터', '스포츠', '날씨', '프리미엄',
+    '알고리즘 안내', '정정보도 모음', '구독설정'
   ];
+  
+  // 정확히 일치하는 제외 단어들 (부분 일치가 아닌 완전 일치)
+  const exactExcludeWords = [
+    '방송뉴스', '언론사편집', '이슈NOW', '콘텐츠', '엔터', '스포츠', '날씨', '프리미엄'
+  ];
+  
+  // 정확히 일치하는 단어는 무조건 제외
+  for (const word of exactExcludeWords) {
+    if (trimmed === word || lowerTrimmed === word.toLowerCase()) {
+      return true;
+    }
+  }
   
   for (const pattern of excludePatterns) {
     if (lowerTrimmed.includes(pattern.toLowerCase())) {
@@ -210,188 +232,221 @@ function shouldExclude(el, text) {
 }
 
 function collectTitleCandidates(includeElements = false) {
-  const selectors = [
-    'article h1',
-    'article h2',
-    'article h3',
-    'article h4',
-    'main h1',
-    'main h2',
-    'main h3',
-    'main h4',
-    '[role="main"] h1',
-    '[role="main"] h2',
-    '[role="main"] h3',
-    '[role="main"] h4',
-    'h1',
-    'h2',
-    'h3',
-    'h4',
-    '[role="heading"]',
-    '[aria-level]',
-    'header h1',
-    'header h2',
-    'header h3',
-    'header h4',
-    'a[role="heading"]',
-    'a[aria-label]',
-    'a[jsname][href]',
-    'a[class*="DY5T1d"]',
-    'a[class*="JtKRv"]',
-    'a[aria-label][href]',
-    'span[class*="DY5T1d"]',
-    'div[class*="DY5T1d"]',
-    // Korean news sites specific selectors
-    '.article-title',
-    '.news-title',
-    '.headline',
-    '[class*="title"]',
-    '[class*="headline"]',
-    '[id*="title"]',
-    '[id*="headline"]',
-    // 머니투데이 및 한국 뉴스 사이트 특화 선택자
-    'a[href*="/view/"]',  // 뉴스 기사 링크
-    'a[href*="/news/"]',  // 뉴스 섹션 링크
-    'li a[href]',  // 리스트 아이템 안의 링크
-    'ul li a',  // 리스트의 링크
-    'ol li a',  // 순서 있는 리스트의 링크
-    '.list-item a',  // 리스트 아이템 클래스
-    '[class*="list"] a[href]',  // 리스트 관련 클래스의 링크
-    'h3 a',  // h3 안의 링크
-    'h2 a',  // h2 안의 링크
-    'h4 a',  // h4 안의 링크
-    'strong a[href]',  // strong 태그 안의 링크
-    'b a[href]',  // b 태그 안의 링크
-    'dt a[href]',  // 정의 목록의 링크
-    'dd a[href]'  // 정의 목록 설명의 링크
-  ];
-
   const seen = new Set();
   const candidates = [];
 
-  // Helper to check if element is in main content area
-  const isInMainContent = (el) => {
-    const main = el.closest('main, article, [role="main"], [role="article"]');
-    if (main) return true;
-    // Check for common content container classes/ids
-    const contentContainer = el.closest('[class*="content"], [class*="article"], [class*="post"], [id*="content"], [id*="article"]');
-    return !!contentContainer;
-  };
+  // 1. 네이버 뉴스 기사 링크: href에 'news.naver.com/article' 포함하는 a 태그
+  const allLinks = document.querySelectorAll('a[href*="news.naver.com/article"]');
 
-  selectors.forEach((selector) => {
-    document.querySelectorAll(selector).forEach((el) => {
-      // Get text from the element, prioritizing textContent for better extraction
-      let text = normalizeWhitespace(
+  allLinks.forEach((el) => {
+    // href 확인 - news.naver.com/article 포함하는지 확인
+    const href = el.getAttribute('href') || '';
+    if (!href.includes('news.naver.com/article')) {
+      return;
+    }
+
+    // 텍스트 추출 - a 태그 안에 있는 strong 태그의 텍스트를 우선 사용, 없으면 a 태그의 텍스트 사용
+    let text = '';
+    
+    // 1순위: a 태그 안에 있는 strong 태그의 텍스트
+    const strongText = el.querySelector('strong');
+    if (strongText && strongText.textContent && strongText.textContent.trim().length > 0) {
+      text = normalizeWhitespace(strongText.textContent);
+    }
+    
+    // 2순위: a 태그 안에 있는 b 태그의 텍스트
+    if (!text || text.length < 8) {
+      const bText = el.querySelector('b');
+      if (bText && bText.textContent && bText.textContent.trim().length > 0) {
+        const bTextContent = normalizeWhitespace(bText.textContent);
+        if (bTextContent.length >= 8) {
+          text = bTextContent;
+        }
+      }
+    }
+    
+    // 3순위: a 태그의 전체 텍스트 (strong/b 태그가 없거나 짧을 때)
+    // a 태그 안에 있는 모든 텍스트를 가져옴 (textContent는 HTML 엔티티를 자동 디코딩: &amp; -> &)
+    if (!text || text.length < 8) {
+      const aTagText = normalizeWhitespace(
         el.textContent ||
         el.innerText ||
         el.getAttribute('aria-label') ||
         el.getAttribute('title') ||
         ''
       );
-      
-      // For link elements, try to get text from direct children or the link itself
-      if ((!text || text.length < 8) && (el.tagName === 'A' || el.tagName === 'a')) {
-        // Try getting text from first text node or first child element
-        const firstTextNode = Array.from(el.childNodes).find(node => 
-          node.nodeType === Node.TEXT_NODE && node.textContent.trim().length > 0
-        );
-        if (firstTextNode) {
-          text = normalizeWhitespace(firstTextNode.textContent);
-        } else if (el.firstElementChild) {
-          // If link contains an element (like strong, span), get its text
-          text = normalizeWhitespace(el.firstElementChild.textContent || el.firstElementChild.innerText);
-        }
+      if (aTagText && aTagText.length >= 8) {
+        text = aTagText;
       }
-      
-      // If text is still empty, try getting from first child text node
-      if (!text && el.firstChild && el.firstChild.nodeType === Node.TEXT_NODE) {
-        text = normalizeWhitespace(el.firstChild.textContent || '');
-      }
-      
-      // For heading elements that might contain links, extract the link text
-      if ((!text || text.length < 8) && /^H[1-6]$/i.test(el.tagName)) {
-        const link = el.querySelector('a');
-        if (link) {
-          text = normalizeWhitespace(link.textContent || link.innerText);
-        }
-      }
-      
-      if (!text || text.length < 8) return;
-      
-      // Exclude navigation and UI elements
-      if (shouldExclude(el, text)) return;
-      
-      // Exclude very short or very long texts that are likely not titles
-      if (text.length < 10 || text.length > 200) return;
-      
-      // Exclude texts that look like navigation (contain only symbols or very short)
-      if (/^[^\w가-힣]+$/.test(text)) return;
-      
-      const key = text.toLowerCase();
-      if (seen.has(key)) return;
-      seen.add(key);
-
-      const articleText = extractArticleTextFromElement(el);
-      const inMainContent = isInMainContent(el);
-      
-      // Higher priority for links that look like news articles
-      let priority = inMainContent ? 1 : 0;
-      if (el.tagName === 'A' || el.tagName === 'a') {
-        const href = el.getAttribute('href') || '';
-        // Boost priority for links that look like news articles
-        if (href.includes('/view/') || href.includes('/news/') || href.includes('/article/')) {
-          priority = 2;
-        } else if (href.includes('http') && !href.includes('#') && !href.includes('javascript:')) {
-          priority = 1;
-        }
-      }
-
-      candidates.push({
-        id: candidates.length,
-        original: text,
-        context: articleText,
-        source: describeSource(el),
-        el: includeElements ? el : undefined,
-        priority: priority
-      });
-    });
-  });
-
-  // Sort by priority (higher priority first), then by text length (longer titles are usually more important)
-  candidates.sort((a, b) => {
-    const priorityDiff = (b.priority || 0) - (a.priority || 0);
-    if (priorityDiff !== 0) return priorityDiff;
-    return (b.original.length || 0) - (a.original.length || 0);
-  });
-
-  // Fallbacks if we found nothing: use document title or meta titles
-  if (!candidates.length) {
-    const fallbackTitles = [];
-    if (document.title && document.title.length > 8) {
-      fallbackTitles.push(document.title);
     }
-    const og = document.querySelector('meta[property="og:title"]')?.content;
-    if (og && og.length > 8) fallbackTitles.push(og);
-    const tw = document.querySelector('meta[name="twitter:title"]')?.content;
-    if (tw && tw.length > 8) fallbackTitles.push(tw);
+    
+    // 텍스트가 없으면 스킵
+    if (!text || text.length < 8) return;
+    
+    // 부모가 strong/b인 경우
+    if (el.parentElement) {
+      const parent = el.parentElement;
+      if ((parent.tagName === 'STRONG' || parent.tagName === 'B' || parent.tagName === 'strong' || parent.tagName === 'b')) {
+        const parentText = normalizeWhitespace(parent.textContent || '');
+        if (parentText.length > text.length && parentText.length >= 10) {
+          text = parentText;
+        }
+      }
+    }
+    
+    // 완전 제외 단어 체크
+    const excludeWords = ['이슈NOW', '언론사편집', '방송뉴스', '다른 언론사 보기', '프리미엄 추천 채널', '최근 검색어', '구독설정'];
+    const lowerText = text.toLowerCase();
+    for (const word of excludeWords) {
+      if (lowerText.includes(word.toLowerCase())) {
+        return; // 완전 제외
+      }
+    }
+    
+    // 제목에서 언론사 이름과 시간 정보 제거
+    if (text) {
+      text = text.replace(/^_?[가-힣a-zA-Z0-9\s]+_\s*\d+월\s*\d+일\s*\d+:\d+\s*/g, '');
+      text = text.replace(/^[가-힣a-zA-Z0-9\s]+\s+\d+월\s*\d+일\s*\d+:\d+\s*/g, '');
+      text = normalizeWhitespace(text);
+    }
+    
+    // 최소 길이 체크
+    if (!text || text.length < 10) return;
+    
+    // 중복 제거
+    const key = text.toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
 
-    fallbackTitles.forEach((t) => {
-      const text = normalizeWhitespace(t);
-      const key = text.toLowerCase();
-      if (seen.has(key) || text.length < 8) return;
-      if (shouldExclude(null, text)) return; // Check exclusion for fallbacks too
-      seen.add(key);
-      candidates.push({
-        id: candidates.length,
-        original: text,
-        context: '',
-        source: 'document-title',
-        el: includeElements ? document.querySelector('title') : undefined
-      });
+    const articleText = extractArticleTextFromElement(el);
+
+    candidates.push({
+      id: candidates.length,
+      original: text,
+      context: articleText,
+      source: describeSource(el),
+      el: includeElements ? el : undefined,
+      priority: 1
     });
-  }
+  });
 
-  // Return more candidates for better coverage (especially for news sites with many headlines)
+  // 2. cnf_news_title 클래스를 가진 요소의 텍스트
+  const cnfTitleElements = document.querySelectorAll('.cnf_news_title');
+
+  cnfTitleElements.forEach((el) => {
+    // strong 태그 안에 있는 경우 strong 태그의 텍스트 우선 사용
+    let text = '';
+    if (el.tagName === 'STRONG' || el.tagName === 'strong') {
+      // textContent는 HTML 엔티티를 자동으로 디코딩함 (&amp; -> &)
+      text = normalizeWhitespace(el.textContent || el.innerText || '');
+    } else {
+      // cnf_news_title 클래스를 가진 요소 내부의 strong 태그 우선
+      const strongText = el.querySelector('strong');
+      if (strongText && strongText.textContent && strongText.textContent.trim().length > 0) {
+        text = normalizeWhitespace(strongText.textContent);
+      } else {
+        text = normalizeWhitespace(
+          el.textContent ||
+          el.innerText ||
+          el.getAttribute('aria-label') ||
+          el.getAttribute('title') ||
+          ''
+        );
+      }
+    }
+    
+    // 텍스트가 없으면 스킵
+    if (!text || text.length < 8) return;
+
+    // 완전 제외 단어 체크
+    const excludeWords = ['이슈NOW', '언론사편집', '방송뉴스', '다른 언론사 보기', '프리미엄 추천 채널', '최근 검색어', '구독설정'];
+    const lowerText = text.toLowerCase();
+    for (const word of excludeWords) {
+      if (lowerText.includes(word.toLowerCase())) {
+        return; // 완전 제외
+      }
+    }
+
+    // 제목에서 언론사 이름과 시간 정보 제거
+    if (text) {
+      text = text.replace(/^_?[가-힣a-zA-Z0-9\s]+_\s*\d+월\s*\d+일\s*\d+:\d+\s*/g, '');
+      text = text.replace(/^[가-힣a-zA-Z0-9\s]+\s+\d+월\s*\d+일\s*\d+:\d+\s*/g, '');
+      text = normalizeWhitespace(text);
+    }
+
+    // 최소 길이 체크
+    if (!text || text.length < 10) return;
+
+    // 중복 제거
+    const key = text.toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+
+    const articleText = extractArticleTextFromElement(el);
+
+    candidates.push({
+      id: candidates.length,
+      original: text,
+      context: articleText,
+      source: describeSource(el),
+      el: includeElements ? el : undefined,
+      priority: 1
+    });
+  });
+
+  // 3. cc_clip_t 클래스를 가진 요소의 텍스트
+  const ccClipElements = document.querySelectorAll('.cc_clip_t');
+
+  ccClipElements.forEach((el) => {
+    // 텍스트 추출
+    let text = normalizeWhitespace(
+      el.textContent ||
+      el.innerText ||
+      el.getAttribute('aria-label') ||
+      el.getAttribute('title') ||
+      ''
+    );
+
+    // 텍스트가 없으면 스킵
+    if (!text || text.length < 8) return;
+
+    // 완전 제외 단어 체크
+    const excludeWords = ['이슈NOW', '언론사편집', '방송뉴스', '다른 언론사 보기', '프리미엄 추천 채널', '최근 검색어', '구독설정'];
+    const lowerText = text.toLowerCase();
+    for (const word of excludeWords) {
+      if (lowerText.includes(word.toLowerCase())) {
+        return; // 완전 제외
+      }
+    }
+
+    // 제목에서 언론사 이름과 시간 정보 제거
+    if (text) {
+      text = text.replace(/^_?[가-힣a-zA-Z0-9\s]+_\s*\d+월\s*\d+일\s*\d+:\d+\s*/g, '');
+      text = text.replace(/^[가-힣a-zA-Z0-9\s]+\s+\d+월\s*\d+일\s*\d+:\d+\s*/g, '');
+      text = normalizeWhitespace(text);
+    }
+
+    // 최소 길이 체크
+    if (!text || text.length < 10) return;
+
+    // 중복 제거
+    const key = text.toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+
+    const articleText = extractArticleTextFromElement(el);
+
+    candidates.push({
+      id: candidates.length,
+      original: text,
+      context: articleText,
+      source: describeSource(el),
+      el: includeElements ? el : undefined,
+      priority: 1
+    });
+  });
+
+  // Return candidates
   return candidates.slice(0, 20);
 }
 
@@ -412,13 +467,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       return true;
     }
 
-    // Retry once after a short delay to allow dynamic content to render (e.g., Google News)
+    // Retry once after a short delay to allow dynamic content to render (e.g., Google News, Naver News)
+    // 네이버 뉴스는 동적 로딩이 많으므로 재시도 시간을 늘림
     setTimeout(() => {
       const retryCandidates = collectTitleCandidates(true);
       lastCandidates = retryCandidates;
       const retryTitles = retryCandidates.map(({ id, original, source, context }) => ({ id, original, source, context }));
       sendResponse({ titles: retryTitles });
-    }, 800);
+    }, 1200); // 네이버 뉴스는 800ms → 1200ms로 증가
     return true; // keep the message channel open
   }
 
