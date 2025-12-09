@@ -1,5 +1,5 @@
 {
-  "name": "plaiground-backend",
+  "name": "newtox-backend",
   "version": "0.1.0",
   "description": "Backend API for rewriting news titles via ChatGPT",
   "main": "dist/index.js",
@@ -23,7 +23,7 @@
     "@types/node": "^22.7.4",
     "nodemon": "^3.1.7",
     "ts-node": "^10.9.2",
-    "tsx": "^4.7.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },
   "engines": {

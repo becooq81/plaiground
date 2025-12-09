@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Plaiground Extension",
+  "name": "NewTox Extension",
   "version": "1.0.0",
-  "description": "A Chrome extension built with Plaiground",
+  "description": "A Chrome extension built with NewTox",
   "permissions": [
     "storage",
     "activeTab",

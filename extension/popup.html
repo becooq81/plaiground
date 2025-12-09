@@ -3,22 +3,45 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Plaiground Extension</title>
+  <title>NewTox Extension</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>Plaiground</h1>
+      <img src="icons/logo.svg" alt="NewTox" class="logo">
     </header>
     <main>
       <div class="section">
-        <p>Analyze this page and suggest calmer, less clickbait headlines.</p>
-        <button id="analyzeBtn" class="btn-primary">Analyze page</button>
-        <p class="hint">Works best on news sites and articles.</p>
+        <p>이 페이지를 분석하여 더 차분하고 클릭베이트가 적은 제목을 제안합니다.</p>
+        <div class="game-mode-toggle">
+          <label class="toggle-label">
+            <input type="checkbox" id="gameModeToggle">
+            <span>게임 모드</span>
+          </label>
+          <p class="hint-small">게임 모드: 번역된 제목을 보고 원본 제목을 맞춰보세요!</p>
+        </div>
+        <button id="analyzeBtn" class="btn-primary">페이지 분석</button>
+        <p class="hint">뉴스 사이트와 기사에서 가장 잘 작동합니다.</p>
       </div>
       <div class="section">
-        <div id="status" class="status">Ready to analyze.</div>
+        <div id="status" class="status">분석 준비 완료.</div>
+        <div id="gameModeContainer" class="game-mode-container" style="display: none;">
+          <div class="game-stats">
+            <div class="stat-item">
+              <span class="stat-label">점수:</span>
+              <span id="gameScore" class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">정답:</span>
+              <span id="gameCorrect" class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">시도:</span>
+              <span id="gameAttempts" class="stat-value">0</span>
+            </div>
+          </div>
+        </div>
         <ul id="titlesList" class="title-list"></ul>
       </div>
     </main>

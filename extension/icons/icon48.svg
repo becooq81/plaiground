@@ -1,6 +1,39 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-  <rect width="48" height="48" fill="#667eea" rx="9.600000000000001"/>
-  <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="28.799999999999997" 
-        fill="white" text-anchor="middle" dominant-baseline="middle" font-weight="bold">P</text>
+<svg width="48" height="48" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad48" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="cleanGrad48" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d9ff"/>
+      <stop offset="100%" style="stop-color:#00ff88"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="400" height="300" fill="url(#bgGrad48)" rx="20"/>
+  
+  <!-- Newspaper icon (left - messy/clickbait) -->
+  <g transform="translate(80, 90)">
+    <rect x="0" y="0" width="70" height="90" fill="#ff6b6b" rx="4" opacity="0.9"/>
+    <rect x="8" y="10" width="54" height="8" fill="#fff" opacity="0.8"/>
+    <rect x="8" y="24" width="40" height="4" fill="#fff" opacity="0.5"/>
+    <rect x="8" y="32" width="50" height="4" fill="#fff" opacity="0.5"/>
+    <text x="50" y="75" fill="#fff" font-size="24" font-weight="bold">!!</text>
+  </g>
+  
+  <!-- Arrow -->
+  <g transform="translate(170, 125)">
+    <path d="M0,15 L40,15 L40,5 L60,20 L40,35 L40,25 L0,25 Z" fill="url(#cleanGrad48)"/>
+  </g>
+  
+  <!-- Newspaper icon (right - clean) -->
+  <g transform="translate(250, 90)">
+    <rect x="0" y="0" width="70" height="90" fill="#00d9ff" rx="4" opacity="0.9"/>
+    <rect x="8" y="10" width="54" height="8" fill="#fff" opacity="0.9"/>
+    <rect x="8" y="24" width="40" height="4" fill="#fff" opacity="0.6"/>
+    <rect x="8" y="32" width="50" height="4" fill="#fff" opacity="0.6"/>
+    <circle cx="52" cy="70" r="12" fill="#00ff88"/>
+    <path d="M46,70 L50,74 L58,64" stroke="#1a1a2e" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
 </svg>
