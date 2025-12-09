@@ -1,0 +1,4 @@
+# Icons are copied from ../icons/ for extension to work
+# (Chrome manifest cannot reference parent directories)
+# Keep the root /icons/ as source of truth
+

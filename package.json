@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A modern Chrome extension built with Manifest V3",
   "scripts": {
-    "generate-icons": "node generate-icons.js",
+    "generate-icons": "node extension/generate-icons.js",
     "lint": "echo 'Add linting tools like ESLint here'",
     "test": "echo 'Add tests here'"
   },

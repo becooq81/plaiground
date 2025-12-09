@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const analyzeBtn = document.getElementById('analyzeBtn');
   const statusDiv = document.getElementById('status');
   const titlesList = document.getElementById('titlesList');
+  const API_URL = 'http://localhost:4000/api/rewrite';
 
   function setStatus(message, variant = '') {
     statusDiv.textContent = message;
@@ -23,6 +24,32 @@ document.addEventListener('DOMContentLoaded', function() {
       `;
       titlesList.appendChild(li);
     });
+  }
+
+  async function rewriteWithBackend(titles) {
+    const payload = {
+      titles: titles.map((t) => t.original),
+      context: titles
+        .map((t) => t.context || '')
+        .filter(Boolean)
+        .slice(0, 3)
+        .join('\n')
+    };
+
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`API error ${res.status}: ${text}`);
+    }
+
+    const data = await res.json();
+    const rewritten = Array.isArray(data.rewritten) ? data.rewritten : [];
+    return rewritten;
   }
 
   async function sendAnalyzeMessage(tabId) {
@@ -63,8 +90,34 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
 
-      renderTitles(titles);
-      setStatus(`Found ${titles.length} headline${titles.length === 1 ? '' : 's'}.`, 'success');
+      setStatus('Rewriting with AI...', '');
+      let rewritten = [];
+      try {
+        rewritten = await rewriteWithBackend(titles);
+      } catch (err) {
+        console.error('Rewrite error:', err);
+        setStatus('Rewrite failed; showing originals.', 'error');
+        rewritten = titles.map((t) => t.original);
+      }
+
+      const rewrites = titles.map((t, idx) => ({
+        id: t.id,
+        original: t.original,
+        source: t.source,
+        alternative: rewritten[idx] || t.original
+      }));
+
+      // Inject back into the page
+      chrome.tabs.sendMessage(
+        tab.id,
+        { action: 'injectRewrites', rewrites: rewrites.map(({ id, alternative }) => ({ id, alternative })) },
+        () => {
+          // ignore errors; best-effort injection
+        }
+      );
+
+      renderTitles(rewrites);
+      setStatus(`Rewrote ${rewrites.length} headline${rewrites.length === 1 ? '' : 's'}.`, 'success');
     } catch (error) {
       console.error('Analysis error:', error);
       setStatus('Unable to analyze this page. Try reloading and ensure content scripts are allowed.', 'error');

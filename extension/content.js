@@ -9,34 +9,6 @@ if (window.__plaigroundContentInjected) {
 } else {
   window.__plaigroundContentInjected = true;
 
-const CLICKBAIT_PHRASES = [
-  /won'?t believe/i,
-  /shocking/i,
-  /you need to see/i,
-  /what happens next/i,
-  /one weird trick/i,
-  /literally everyone/i,
-  /goes viral/i,
-  /will change your life/i,
-  /breaks the internet/i
-];
-
-const CLICKBAIT_WORDS = [
-  'unbelievable',
-  'jaw-dropping',
-  'mind-blowing',
-  'insane',
-  'crazy',
-  'stunning',
-  'epic',
-  'ultimate',
-  'secret',
-  'exclusive',
-  'must-see',
-  'viral',
-  '쏟아냈다'
-];
-
 function normalizeWhitespace(text) {
   return text.replace(/\s+/g, ' ').trim();
 }
@@ -99,32 +71,6 @@ function injectAlternatives(candidates) {
   });
 }
 
-function firstSentence(text) {
-  const cleaned = normalizeWhitespace(text);
-  const match = cleaned.match(/([^.!?]{15,}?[.!?])\s/);
-  return match ? match[1].trim() : cleaned.slice(0, 160).trim();
-}
-
-function cleanClickbait(title) {
-  let cleaned = normalizeWhitespace(title);
-  CLICKBAIT_PHRASES.forEach((re) => {
-    cleaned = cleaned.replace(re, '');
-  });
-
-  CLICKBAIT_WORDS.forEach((word) => {
-    const re = new RegExp(`\\b${word}\\b`, 'ig');
-    cleaned = cleaned.replace(re, '');
-  });
-
-  cleaned = cleaned.replace(/[!?]{2,}/g, '');
-  cleaned = cleaned.replace(/^[^a-zA-Z0-9]+/, '').trim();
-
-  if (!cleaned) return title.trim();
-
-  // Capitalize first letter for readability
-  return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
-}
-
 function extractArticleTextFromElement(element) {
   const article = element.closest('article') || document.querySelector('article');
   if (!article) return '';
@@ -144,20 +90,7 @@ function describeSource(element) {
   return tag;
 }
 
-function generateAlternativeTitle(original, articleText) {
-  const cleaned = cleanClickbait(original);
-  const articleSentence = articleText ? firstSentence(articleText) : '';
-
-  if (articleSentence && articleSentence.length > 30) {
-    return articleSentence;
-  }
-
-  if (cleaned.length < 12 && articleSentence) {
-    return articleSentence;
-  }
-
-  return cleaned;
-}
+let lastCandidates = [];
 
 function collectTitleCandidates(includeElements = false) {
   const selectors = [
@@ -202,11 +135,11 @@ function collectTitleCandidates(includeElements = false) {
       seen.add(key);
 
       const articleText = extractArticleTextFromElement(el);
-      const alternative = generateAlternativeTitle(text, articleText);
 
       candidates.push({
+        id: candidates.length,
         original: text,
-        alternative,
+        context: articleText,
         source: describeSource(el),
         el: includeElements ? el : undefined
       });
@@ -230,8 +163,9 @@ function collectTitleCandidates(includeElements = false) {
       if (seen.has(key) || text.length < 8) return;
       seen.add(key);
       candidates.push({
+        id: candidates.length,
         original: text,
-        alternative: generateAlternativeTitle(text, ''),
+        context: '',
         source: 'document-title',
         el: includeElements ? document.querySelector('title') : undefined
       });
@@ -250,10 +184,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
   if (request.action === 'analyzeNewsTitles') {
     const candidates = collectTitleCandidates(true);
-    const titles = candidates.map(({ original, alternative, source }) => ({ original, alternative, source }));
+    lastCandidates = candidates;
+    const titles = candidates.map(({ id, original, source, context }) => ({ id, original, source, context }));
 
     if (titles.length) {
-      injectAlternatives(candidates);
       sendResponse({ titles });
       return true;
     }
@@ -261,13 +195,29 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // Retry once after a short delay to allow dynamic content to render (e.g., Google News)
     setTimeout(() => {
       const retryCandidates = collectTitleCandidates(true);
-      const retryTitles = retryCandidates.map(({ original, alternative, source }) => ({ original, alternative, source }));
-      if (retryTitles.length) {
-        injectAlternatives(retryCandidates);
-      }
+      lastCandidates = retryCandidates;
+      const retryTitles = retryCandidates.map(({ id, original, source, context }) => ({ id, original, source, context }));
       sendResponse({ titles: retryTitles });
     }, 800);
     return true; // keep the message channel open
+  }
+
+  if (request.action === 'injectRewrites') {
+    const rewrites = request.rewrites || [];
+    const merged = rewrites
+      .map((rw) => {
+        const target = lastCandidates.find((c) => c.id === rw.id);
+        if (!target || !target.el || !rw.alternative) return null;
+        return { ...target, alternative: rw.alternative };
+      })
+      .filter(Boolean);
+
+    if (merged.length) {
+      injectAlternatives(merged);
+    }
+
+    sendResponse({ status: 'injected', count: merged.length });
+    return true;
   }
 
   return false;
