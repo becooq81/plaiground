@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', function() {
   const analyzeBtn = document.getElementById('analyzeBtn');
   const statusDiv = document.getElementById('status');
   const titlesList = document.getElementById('titlesList');
+  // Configure your backend API URL here
+  // For local development: 'http://localhost:4000/api/rewrite'
+  // For production: 'https://your-api-domain.com/api/rewrite'
   const API_URL = 'http://localhost:4000/api/rewrite';
 
   function setStatus(message, variant = '') {
@@ -27,13 +30,16 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   async function rewriteWithBackend(titles) {
+    // Collect article context from first few titles that have it
+    const contextTexts = titles
+      .map((t) => t.context || '')
+      .filter((ctx) => ctx && ctx.length > 20) // Only meaningful context
+      .slice(0, 3)
+      .join('\n\n');
+
     const payload = {
       titles: titles.map((t) => t.original),
-      context: titles
-        .map((t) => t.context || '')
-        .filter(Boolean)
-        .slice(0, 3)
-        .join('\n')
+      context: contextTexts || undefined
     };
 
     const res = await fetch(API_URL, {
@@ -76,12 +82,20 @@ document.addEventListener('DOMContentLoaded', function() {
         // First attempt: assumes content script already loaded
         response = await sendAnalyzeMessage(tab.id);
       } catch (err) {
+        console.log('Content script not found, injecting...', err);
         // Fallback: inject content script into this tab, then retry once
-        await chrome.scripting.executeScript({
-          target: { tabId: tab.id, allFrames: true },
-          files: ['content.js']
-        });
-        response = await sendAnalyzeMessage(tab.id);
+        try {
+          await chrome.scripting.executeScript({
+            target: { tabId: tab.id, allFrames: true },
+            files: ['content.js']
+          });
+          // Wait a bit for script to initialize
+          await new Promise(resolve => setTimeout(resolve, 100));
+          response = await sendAnalyzeMessage(tab.id);
+        } catch (injectErr) {
+          console.error('Failed to inject content script:', injectErr);
+          throw new Error('Could not inject content script. Make sure the extension has scripting permissions.');
+        }
       }
 
       const titles = response?.titles || [];
@@ -110,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // Inject back into the page
       chrome.tabs.sendMessage(
         tab.id,
-        { action: 'injectRewrites', rewrites: rewrites.map(({ id, alternative }) => ({ id, alternative })) },
+        { action: 'injectRewrites', rewrites: rewrites.map(({ id, original, alternative }) => ({ id, original, alternative })) },
         () => {
           // ignore errors; best-effort injection
         }
