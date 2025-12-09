@@ -1,43 +1,51 @@
-<svg width="128" height="128" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bgGrad128" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#1a1a2e"/>
       <stop offset="100%" style="stop-color:#16213e"/>
     </linearGradient>
-    <linearGradient id="cleanGrad128" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="cleanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#00d9ff"/>
       <stop offset="100%" style="stop-color:#00ff88"/>
     </linearGradient>
   </defs>
   
   <!-- Background -->
-  <rect width="400" height="300" fill="url(#bgGrad128)" rx="20"/>
+  <rect width="400" height="300" fill="url(#bgGrad)" rx="20"/>
   
   <!-- Newspaper icon (left - messy/clickbait) -->
   <g transform="translate(80, 90)">
+    <!-- Paper -->
     <rect x="0" y="0" width="70" height="90" fill="#ff6b6b" rx="4" opacity="0.9"/>
     <rect x="8" y="10" width="54" height="8" fill="#fff" opacity="0.8"/>
     <rect x="8" y="24" width="40" height="4" fill="#fff" opacity="0.5"/>
     <rect x="8" y="32" width="50" height="4" fill="#fff" opacity="0.5"/>
     <rect x="8" y="40" width="35" height="4" fill="#fff" opacity="0.5"/>
+    <!-- Exclamation marks (clickbait) -->
     <text x="50" y="75" fill="#fff" font-size="24" font-weight="bold">!!</text>
   </g>
   
   <!-- Arrow -->
   <g transform="translate(170, 125)">
-    <path d="M0,15 L40,15 L40,5 L60,20 L40,35 L40,25 L0,25 Z" fill="url(#cleanGrad128)"/>
+    <path d="M0,15 L40,15 L40,5 L60,20 L40,35 L40,25 L0,25 Z" fill="url(#cleanGrad)"/>
   </g>
   
   <!-- Newspaper icon (right - clean) -->
   <g transform="translate(250, 90)">
+    <!-- Paper -->
     <rect x="0" y="0" width="70" height="90" fill="#00d9ff" rx="4" opacity="0.9"/>
     <rect x="8" y="10" width="54" height="8" fill="#fff" opacity="0.9"/>
     <rect x="8" y="24" width="40" height="4" fill="#fff" opacity="0.6"/>
     <rect x="8" y="32" width="50" height="4" fill="#fff" opacity="0.6"/>
     <rect x="8" y="40" width="35" height="4" fill="#fff" opacity="0.6"/>
+    <!-- Checkmark (verified) -->
     <circle cx="52" cy="70" r="12" fill="#00ff88"/>
     <path d="M46,70 L50,74 L58,64" stroke="#1a1a2e" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
+  
+  <!-- Text -->
+  <text x="200" y="220" text-anchor="middle" fill="#ffffff" font-size="28" font-weight="bold" font-family="Arial, sans-serif">News Detox</text>
+  <text x="200" y="248" text-anchor="middle" fill="url(#cleanGrad)" font-size="14" font-family="Arial, sans-serif">뉴스 디톡스</text>
   
   <!-- Sparkles -->
   <circle cx="320" y="80" r="3" fill="#00ff88" opacity="0.8"/>

@@ -8,7 +8,7 @@
 2. Navigate to `chrome://extensions/`
 3. Enable **Developer mode** (toggle in the top-right corner)
 4. Click **Load unpacked**
-5. Select the `extension/` folder inside the plaiground directory
+5. Select the `extension/` folder inside the newtox directory
 
 **Note**: Icons are already included as SVG files in `extension/icons/`. They work fine for development.
 
@@ -44,7 +44,7 @@ After making code changes:
 ## File Structure
 
 ```
-plaiground/
+newtox/
 ├── manifest.json       # Extension configuration
 ├── popup.html          # Popup UI
 ├── popup.css           # Popup styles

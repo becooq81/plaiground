@@ -1,4 +1,4 @@
-# Plaiground
+# NewTox
 
 Chrome extension + backend API for translating clickbait titles into neutral, fact-based language using ChatGPT.
 
@@ -45,7 +45,7 @@ The backend will run on `http://localhost:4000` and automatically calls OpenAI's
 ## Project Structure
 
 ```
-plaiground/
+newtox/
 ├── extension/          # Chrome extension (Manifest V3)
 │   ├── icons/          # Extension icons
 │   ├── popup.js        # Extension UI (calls backend API)

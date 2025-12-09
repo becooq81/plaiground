@@ -1,5 +1,5 @@
 {
-  "name": "plaiground-extension",
+  "name": "newtox-extension",
   "version": "1.0.0",
   "description": "A modern Chrome extension built with Manifest V3",
   "scripts": {
