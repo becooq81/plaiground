@@ -5,6 +5,11 @@ node_modules/
 dist/
 build/
 
+# Environment variables (contains sensitive API keys)
+.env
+.env.local
+.env.*.local
+
 # OS files
 .DS_Store
 Thumbs.db

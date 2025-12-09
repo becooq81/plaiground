@@ -18,7 +18,7 @@ if (typeof window !== 'undefined') {
 
 const ICON_DIR = path.join(__dirname, 'icons');
 const sizes = [16, 48, 128];
-const color = '#667eea'; // Brand color
+const color = '#3b82f6'; // Brand color (blue)
 
 console.log('🎨 Generating placeholder icons...\n');
 
