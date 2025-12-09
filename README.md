@@ -137,35 +137,6 @@ Game Mode is an interactive feature where:
 4. Scores ≥70 are considered correct
 5. Statistics track total score, correct answers, and attempts
 
-## Supported News Sites
-
-Optimized for:
-- **Naver News** (https://news.naver.com/) - Primary target
-- **Money Today** (https://www.mt.co.kr/)
-- Other Korean news sites with similar structure
-
-## Title Detection
-
-The extension recognizes titles from:
-- `<a href*="news.naver.com/article">` links
-- Elements with class `cnf_news_title`
-- Elements with class `cc_clip_t`
-
-Text extraction prioritizes:
-1. `strong` tags inside links
-2. `b` tags inside links
-3. Full link text
-
-## Excluded Content
-
-The following words/phrases are automatically excluded:
-- 이슈NOW
-- 언론사편집
-- 방송뉴스
-- 다른 언론사 보기
-- 프리미엄 추천 채널
-- 최근 검색어
-- 구독설정
 
 ## Technical Details
 
