@@ -1,5 +1,5 @@
 {
-  "name": "newtox-extension",
+  "name": "websquarea-extension",
   "version": "1.0.0",
   "description": "A modern Chrome extension built with Manifest V3",
   "scripts": {

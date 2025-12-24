@@ -1,10 +1,10 @@
-# NewTox
+# WebSquareA
 
 Chrome extension + backend API for translating clickbait Korean news titles into neutral, fact-based language using ChatGPT.
 
 ## Overview
 
-NewTox (News Detox) helps you read news more objectively by automatically rewriting clickbait headlines into neutral, factual titles. The extension works especially well with Korean news sites like Naver News.
+WebSquareA helps you read news more objectively by automatically rewriting clickbait headlines into neutral, factual titles. The extension works especially well with Korean news sites like Naver News.
 
 ## Architecture
 
@@ -74,7 +74,7 @@ The backend will run on `http://localhost:4000` and automatically calls OpenAI's
 ## Project Structure
 
 ```
-newtox/
+websquarea/
 ├── extension/          # Chrome extension (Manifest V3)
 │   ├── icons/          # Extension icons (SVG logo)
 │   ├── popup.html      # Extension popup UI

@@ -1,5 +1,5 @@
 {
-  "name": "newtox-backend",
+  "name": "websquarea-backend",
   "version": "0.1.0",
   "description": "Backend API for rewriting news titles via ChatGPT",
   "main": "dist/index.js",
