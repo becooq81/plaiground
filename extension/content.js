@@ -1,13 +1,13 @@
 // Content script - runs on web pages matching the patterns in manifest.json
 
-console.log('NewTox extension content script loaded');
+console.log('WebSquareA extension content script loaded');
 
 // Prevent double-injection if the script is programmatically injected more than once
-if (window.__newtoxContentInjected) {
+if (window.__websquareaContentInjected) {
   // Already injected; skip re-registering listeners
-  console.debug('NewTox content already injected');
+  console.debug('WebSquareA content already injected');
 } else {
-  window.__newtoxContentInjected = true;
+  window.__websquareaContentInjected = true;
 }
 
 function normalizeWhitespace(text) {
@@ -15,11 +15,11 @@ function normalizeWhitespace(text) {
 }
 
 function ensureStylesInjected() {
-  if (document.getElementById('newtox-alt-style')) return;
+  if (document.getElementById('websquarea-alt-style')) return;
   const style = document.createElement('style');
-  style.id = 'newtox-alt-style';
+  style.id = 'websquarea-alt-style';
   style.textContent = `
-    .newtox-alt-block {
+    .websquarea-alt-block {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       margin-top: 4px;
       padding: 6px 8px;
@@ -30,7 +30,7 @@ function ensureStylesInjected() {
       color: #111827;
       line-height: 1.4;
     }
-    .newtox-alt-label {
+    .websquarea-alt-label {
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.4px;
@@ -38,7 +38,7 @@ function ensureStylesInjected() {
       margin-bottom: 4px;
       font-weight: 600;
     }
-    .newtox-alt-text {
+    .websquarea-alt-text {
       font-size: 14px;
       font-weight: 600;
     }
@@ -47,7 +47,7 @@ function ensureStylesInjected() {
 }
 
 function clearInjectedAlternatives() {
-  document.querySelectorAll('.newtox-alt-block').forEach((node) => node.remove());
+  document.querySelectorAll('.websquarea-alt-block').forEach((node) => node.remove());
   // Restore original titles if they were replaced in game mode
   document.querySelectorAll('[data-original-title]').forEach((el) => {
     const original = el.dataset.originalTitle;
@@ -120,14 +120,14 @@ function injectAlternatives(candidates, gameMode = false) {
       if (!insertTarget.parentNode) return;
       
       const block = document.createElement('div');
-      block.className = 'newtox-alt-block';
+      block.className = 'websquarea-alt-block';
 
       const label = document.createElement('div');
-      label.className = 'newtox-alt-label';
+      label.className = 'websquarea-alt-label';
       label.textContent = '대안 제목';
 
       const text = document.createElement('div');
-      text.className = 'newtox-alt-text';
+      text.className = 'websquarea-alt-text';
       text.textContent = alternative;
 
       block.appendChild(label);

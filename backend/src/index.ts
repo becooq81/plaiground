@@ -154,6 +154,6 @@ app.post('/api/rewrite', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`[newtox-backend] listening on http://localhost:${PORT}`);
+  console.log(`[websquarea-backend] listening on http://localhost:${PORT}`);
 });
 

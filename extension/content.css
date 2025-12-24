@@ -2,13 +2,13 @@
 
 /* Example: Style any custom elements you inject into pages */
 
-.newtox-highlight {
+.websquarea-highlight {
   background-color: #dbeafe;
   border-radius: 3px;
   padding: 2px 4px;
 }
 
-.newtox-notification {
+.websquarea-notification {
   position: fixed;
   top: 20px;
   right: 20px;

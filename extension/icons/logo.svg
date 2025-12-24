@@ -44,8 +44,8 @@
   </g>
   
   <!-- Text -->
-  <text x="200" y="220" text-anchor="middle" fill="#ffffff" font-size="28" font-weight="bold" font-family="Arial, sans-serif">News Detox</text>
-  <text x="200" y="248" text-anchor="middle" fill="url(#cleanGrad)" font-size="14" font-family="Arial, sans-serif">뉴스 디톡스</text>
+  <text x="200" y="220" text-anchor="middle" fill="#ffffff" font-size="28" font-weight="bold" font-family="Arial, sans-serif">WebSquareA</text>
+  <text x="200" y="248" text-anchor="middle" fill="url(#cleanGrad)" font-size="14" font-family="Arial, sans-serif">웹스퀘어A</text>
   
   <!-- Sparkles -->
   <circle cx="320" y="80" r="3" fill="#00ff88" opacity="0.8"/>
